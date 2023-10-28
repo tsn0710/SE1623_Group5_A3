@@ -1,0 +1,78 @@
+﻿@{
+    ViewData["Title"] = "Detail Order";
+}
+@inject IHttpContextAccessor HttpContextAccessor;
+@{
+    string email = HttpContextAccessor.HttpContext.Session.GetString("Email") ?? "";
+}
+@if (email.Length == 0)
+{
+    <script type="text/javascript">
+        alert("Please login first");
+        window.location.href = "../../Home/Login";
+    </script>
+}
+<table style="width:50%;height:auto;border-radius:20px;background-color: #5F9EC0">
+    <tr>
+        <td><p style="margin:5px">OrderId</p></td>
+        <td><p style="margin:5px" id="orderId"></p></td>
+    </tr>
+    <tr>
+        <td><p style="margin:5px">MemberId </p></td>
+        <td><p style="margin:5px" id="memberId"></p></td>
+    </tr>
+    <tr>
+        <td><p style="margin:5px">OrderDate </p></td>
+        <td><p style="margin:5px" id="orderDate"></p></td>
+    </tr>
+    <tr>
+        <td><p style="margin:5px">RequiredDate </p></td>
+        <td><p style="margin:5px" id="requiredDate"></p></td>
+    </tr>
+    <tr>
+        <td><p style="margin:5px">ShippedDate </p></td>
+        <td><p style="margin:5px" id="shippedDate"></p></td>
+    </tr>
+    <tr>
+        <td><p style="margin:5px">Freight </p></td>
+        <td><p style="margin:5px" id="freight"></p></td>
+    </tr>
+</table>
+<div id="listOD"></div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        ShowOrderDetail();
+        function ShowOrderDetail() {
+            $("#listOD").html("");
+            $.ajax({
+                url: "https://localhost:7294/odata/Orders("+ @ViewBag.orderId+")?$expand=OrderDetails",
+                type: "get",
+                contentType: "application/json",
+                success: function (result, status, xhr) {
+                    $("#orderId").html(result["OrderId"]);
+                    $("#memberId").html(result["MemberId"]);
+                    $("#orderDate").html(result["OrderDate"]);
+                    $("#requiredDate").html(result["RequiredDate"]);
+                    $("#shippedDate").html(result["ShippedDate"]);
+                    $("#freight").html(result["Freight"]);
+                    var str="";
+                    $.each(result["OrderDetails"], function (index, value) {
+                        str = str + "<div> <table style=\"width: 80%; height: auto; border-radius: 20px; margin-top: 10px; background-color:#7DCE85\"><tr><td style=\"width: 10 % \"><p style=\"margin: 5px\"> OrderDetailId </p></td><td style=\"width: 10 % \"><p style=\"margin: 5px\"> ProductId </p></td><td style=\"width: 10 % \"><p style=\"margin: 5px\"> UnitPrice </p></td> <td style=\"width: 10 % \"><p style=\"margin: 5px\"> Quantity </p></td><td style=\"width: 10 % \"><p style=\"margin: 5px\"> Discount </p></td></tr>";
+                        str = str + "<tr>";
+                        str = str + "<td><input value=\"" + value["OrderDetailId"] + "\" style = \"margin:5px; border-radius:5px;padding-left:10px\" readonly /></td>";
+                        str = str + "<td><input value=\"" + value["ProductId"] + "\" style = \"margin:5px; border-radius:5px;padding-left:10px\" readonly /></td>";
+                        str = str + "<td><input value=\"" + value["UnitPrice"] + "\" style = \"margin:5px; border-radius:5px;padding-left:10px\" readonly /></td>";
+                        str = str + "<td><input value=\"" + value["Quantity"] + "\" style = \"margin:5px; border-radius:5px;padding-left:10px\" readonly /></td>";
+                        str = str + "<td><input value=\"" + value["Discount"] + "\" style = \"margin:5px; border-radius:5px;padding-left:10px\" readonly /></td>";
+                        str = str + "</tr>";
+                        str = str + "</table></div>";
+                    });
+                    $("#listOD").html(str);
+                },
+                error: function (xhr, status, error) {
+                    console.log(xhr)
+                }
+            });
+        }
+    })
+</script>

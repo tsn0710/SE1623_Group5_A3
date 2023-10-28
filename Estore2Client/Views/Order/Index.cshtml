@@ -1,0 +1,68 @@
+﻿
+
+@{
+    ViewData["Title"] = "Order List";
+
+}
+<a class="page-link border-radi" asp-action="Create"
+   style="width:100%; border:2px solid #BD0A2A;color:white;background:#BD342E;text-align: center;border-radius:10px">Create new Order</a>
+<table class="table" style="width:85%">
+    <thead>
+        <tr>
+            <th>
+                <p>Order Id</p>
+            </th>
+            <th>
+                <p>Member Id</p>
+            </th>
+            <th>
+                <p>Order Date</p>
+            </th>
+            <th>
+                <p>Required Date</p>
+            </th>
+            <th>
+                <p>Shipped Date</p>
+            </th>
+            <th>
+                <p>Freight</p>
+            </th>
+            <th>
+            </th>
+            <th>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+<script type="text/javascript">
+    $(document).ready(function (){
+        ShowAllOrder();
+        function ShowAllOrder(){
+            $("table tbody").html("");
+            $.ajax({
+                url:"https://localhost:7294/odata/Orders",
+                type:"get",
+                contentType:"application/json",
+                success:function(result,status,xhr){
+                    $.each(result["value"], function (index, value) {
+                        $("tbody").append($("<tr>"));
+                        appendElement=$("tbody tr").last();
+                        appendElement.append($("<td>").html(value["OrderId"]));
+                        appendElement.append($("<td>").html(value["MemberId"]));
+                        appendElement.append($("<td>").html(value["OrderDate"]));
+                        appendElement.append($("<td>").html(value["RequiredDate"]));
+                        appendElement.append($("<td>").html(value["ShippedDate"]));
+                        appendElement.append($("<td>").html(value["Freight"]));
+                        appendElement.append("<td style=\"width:8%\"><a class=\"page-link border-radi\" href=\"https://localhost:7006/Order/Detail/" + value["OrderId"] + "\" style=\"width:100%; border:2px solid #BD0A2A;color:white;background:#BD342E;text-align: center;border-radius:10px\">Detail</a> </td>");
+                        appendElement.append("<td style=\"width:8%\"><a class=\"page-link border-radi\" href=\"https://localhost:7006/Order/Delete/" + value["OrderId"] + "\" style=\"width:100%; border:2px solid #BD0A2A;color:white;background:#BD342E;text-align: center;border-radius:10px\">Delete</a> </td>");
+                    });
+                },
+                error: function (xhr, status, error){
+                    console.log(xhr)
+                }
+            });
+        }
+    })
+</script>

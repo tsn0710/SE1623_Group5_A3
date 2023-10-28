@@ -1,0 +1,74 @@
+﻿@{
+    ViewData["Title"] = "Create order";
+
+}
+@inject IHttpContextAccessor HttpContextAccessor;
+@{
+    string email = HttpContextAccessor.HttpContext.Session.GetString("Email") ?? "";
+}
+@if (email.Length == 0)
+{
+    <script type="text/javascript">
+        alert("Please login first");
+        window.location.href = "../../Home/Login";
+    </script>
+}
+<p id="result"></p>
+<div class="row">
+    <div class="col-md-4"></div>
+    <div class="col-md-4">
+            <br>
+            <div class="form-group">
+                <input id="OrderId" class="form-control" value="0" readonly="readonly" hidden />
+            </div>
+            <div class="form-group">
+                <label name="MemberId" class="control-label">MemberId(<span style="color:red">*</span>)</label>
+            <input type="number" name="MemberId" id="MemberId" class="form-control" value="@HttpContextAccessor.HttpContext.Session.GetInt32("MemberId")" readonly="readonly" />
+            </div>
+            <div class="form-group">
+                <label name="OrderDate" class="control-label">OrderDate(<span style="color:red">*</span>)</label>
+            <input name="OrderDate" class="form-control" type="date" id="OrderDate" value="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+            </div>
+            <div class="form-group">
+                <label name="RequiredDate" class="control-label">RequiredDate</label>
+                <input name="RequiredDate" class="form-control" type="date" id="RequiredDate" />
+            </div>
+            <div class="form-group">
+                <label name="ShippedDate" class="control-label">ShippedDate(<span style="color:red">*</span>)</label>
+            <input name="ShippedDate" class="form-control" type="date" id="ShippedDate" value="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+            </div>
+            <div class="form-group">
+                <label name="Freight" class="control-label">Freight</label>
+                <input type="number" name="Freight" id="Freight" class="form-control" />
+            </div>
+            <div class="form-group">
+            <button id="CreateButton" type="submit" class="btn btn-primary" style="width:100%;margin-top:5px">Đăng ký</button>
+            </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#CreateButton").click(function (e){
+            $("#result").html("Đang thêm order, xin hãy chờ ...");
+            $.ajax({
+                url: "https://localhost:7294/odata/Orders",
+                type:"post",
+                contentType:"application/json",
+                data: JSON.stringify({
+                    OrderId:0,
+                    MemberId: parseInt($("#MemberId").val()),
+                    OrderDate: $("#OrderDate").val(),
+                    RequiredDate: $("#RequiredDate").val(),
+                    ShippedDate: $("#ShippedDate").val(),
+                    Freight: parseInt($("#Freight").val())
+                }),
+                success:function(result,status,xhr){
+                    $("#result").html("Thêm order thành công: OrderId = " + parseInt(result["value"]));
+                },
+                error: function(xhr,status,error){
+                    $("#result").html("Thêm order thất bại :(");
+                }
+            })
+        })
+    })
+</script>
