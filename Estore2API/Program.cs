@@ -17,7 +17,7 @@ namespace Estore2API
             modelBuilder.EntitySet<Product>("Products");
             modelBuilder.EntitySet<Order>("Orders");
             modelBuilder.EntitySet<OrderDetail>("OrderDetails");
-
+            modelBuilder.EntitySet<Report>("Reports");
             builder.Services.AddDbContext<eStoreContext>();
 
             builder.Services.AddControllers().AddOData(

@@ -1,0 +1,61 @@
+﻿@using System.Globalization;
+@{
+    ViewData["Title"] = "Report Statistic";
+}
+@inject IHttpContextAccessor HttpContextAccessor;
+@{
+    string email = HttpContextAccessor.HttpContext.Session.GetString("Email") ?? "";
+}
+@if (email.Length == 0)
+{
+        <script type="text/javascript">
+            alert("Please login first");
+            window.location.href = "Home/Login";
+        </script>
+}
+<label name="dfrom" >Date from: </label>
+<input type="date" name="dfrom" id="dfrom" value="2023-01-01" />
+<label name="dto" >Date to: </label>
+<input type="date" name="dto" id="dto" value="2023-12-31" />
+<button  value="Search" class="form-control" id="Search"
+style="width:100%;height:100%;background-color:#BD0A2A;color:white;margin-top:10px;margin-bottom:10px" >Enter</button>
+
+<table class="table">
+    <thead>
+        <tr>
+            <td>
+                Order Date <span style="color:gray">(GroupBy)</span>
+            </td>
+            <td>
+                Total Money <span style="color:gray">( = Quantity * UnitPrice * (100 - Discount) / 100), (DESC)</span>
+            </td>
+        </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+</table>
+<script type="text/javascript">
+    $("#Search").click(function (e) {
+            var dfrom = $('#dfrom').val().split('/');
+            var dto = $('#dto').val().split('/');
+            $("table tbody").html("");
+            $.ajax({
+            url: "https://localhost:7294/odata/Reports?$filter=OrderDate ge " + dfrom[0] + " and OrderDate le " + dto[0] + " &$orderby=Total desc",
+                type: "get",
+                contentType: "application/json",
+                success: function (result, status, xhr) {
+                    $.each(result["value"], function (index, value) {
+                        $("tbody").append($("<tr>"));
+                        appendElement = $("tbody tr").last();
+                        appendElement.append($("<td>").html(value["OrderDate"].split('T')[0]));
+                        appendElement.append($("<td>").html(value["Total"]));
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.log(xhr)
+                }
+            });
+        
+    })
+</script>
